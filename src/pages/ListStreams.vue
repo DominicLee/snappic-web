@@ -6,13 +6,13 @@
         <q-btn size="md" rounded color="secondary" label="Create a stream" @click="addStream"></q-btn>
       </template>
     </EmptyState>
-    <q-card v-else>
+    <q-card v-else class="animated fadeInDown slow">
       <q-card-section>
         <StreamEditor v-for="(stream, index) in $streamStore.getAllStreams" :key="stream.uuid" :color="stream.color"
                       :start-time="stream.startTime" :end-time="stream.endTime" :name="stream.name"
                       :uuid="stream.uuid"></StreamEditor>
       </q-card-section>
-      <q-card-actions align="center">
+      <q-card-actions align="center" class="q-pb-lg">
         <q-btn color="primary" rounded no-caps label="Add a new stream" @click="addStream"></q-btn>
       </q-card-actions>
     </q-card>

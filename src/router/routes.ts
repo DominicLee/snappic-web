@@ -11,9 +11,6 @@ const routes: RouteRecordRaw[] = [
       {name: 'Stream Calaculator', path: '/calculator', component: () => import('pages/StreamCalculator.vue')},
     ],
   },
-
-  // Always leave this as last one,
-  // but you can also remove it
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue'),

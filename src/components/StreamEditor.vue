@@ -47,8 +47,8 @@
     </q-input>
     <q-btn style="margin-bottom: 20px" v-if="!isDirty" round flat color="primary" icon="mdi-delete"
            @click="confirmDelete"></q-btn>
-    <q-btn style="margin-bottom: 20px" v-else round flat color="primary" icon="mdi-content-save"
-           @click="saveStream" :disable="!saveActive"></q-btn>
+    <q-btn style="margin-bottom: 20px" v-else round flat color="red" icon="mdi-content-save"
+           @click="saveStream" class="animated tada slower"></q-btn>
   </div>
 </template>
 

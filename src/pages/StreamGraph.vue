@@ -7,8 +7,7 @@
       </template>
     </EmptyState>
     <div v-else class="full-width">
-      <div class="text-h6 q-mb-md">Stream Visualisation</div>
-      <q-card class="full-width">
+      <q-card class="full-width animated fadeInDown slow">
         <q-card-section>
           <StreamDisplay v-for="(stream, index) in $streamStore.getAllStreams" :key="stream.uuid"
                          :min="stream.startTime" :max="stream.endTime" :stream-color="stream.color"
@@ -16,16 +15,15 @@
         </q-card-section>
       </q-card>
       <q-separator class="q-my-md"></q-separator>
-      <div class="text-h6 q-mb-md">Stream Statistics</div>
       <div class="flex q-gutter-md">
-        <q-card>
+        <q-card class="animated fadeInDown slow delay-1s">
           <q-card-section>
             <div class="text-h6">Total Stream Time</div>
             <div>Represents how much gross stream time we have</div>
             <div class="statistic">{{ floatToTimeString(totalStreamTime) }}</div>
           </q-card-section>
         </q-card>
-        <q-card>
+        <q-card class="animated fadeInDown slow delay-2s">
           <q-card-section>
             <div class="text-h6">Rationalised Stream Time</div>
             <div>Represents how much non-overlapping stream time we have</div>
