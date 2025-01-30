@@ -1,7 +1,9 @@
 <template>
   <div class="flex items-center q-pa-xs bg-white q-gutter-sm">
-    <q-input v-model="nameRef" filled label="Name"></q-input>
-    <q-input filled v-model="startTimeRef" mask="time" label="Start Time" :rules="['time']" hide-bottom-space>
+    <q-input v-model="nameRef" filled label="Name"
+             :rules="[ val => val.length > 2 || 'Minimum of 3 characters' ]"></q-input>
+    <q-input filled v-model="startTimeRef" :error="!!startTimeError" :error-message="startTimeError as string"
+             mask="time" label="Start Time" :rules="['time']">
       <template v-slot:append>
         <q-icon name="access_time" class="cursor-pointer">
           <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -14,7 +16,8 @@
         </q-icon>
       </template>
     </q-input>
-    <q-input filled v-model="endTimeRef" mask="time" label="End Time" :rules="['time']" hide-bottom-space>
+    <q-input filled v-model="endTimeRef" :error="!!endTimeError" :error-message="endTimeError as string" mask="time"
+             label="End Time" :rules="['time']">
       <template v-slot:append>
         <q-icon name="access_time" class="cursor-pointer">
           <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -32,6 +35,7 @@
       v-model="colorRef"
       class="my-input"
       label="Colour"
+      style="padding-bottom: 20px"
     >
       <template v-slot:append>
         <q-icon name="colorize" class="cursor-pointer" :style="`color: ${colorRef}`">
@@ -41,12 +45,15 @@
         </q-icon>
       </template>
     </q-input>
-    <q-btn round flat color="primary" icon="mdi-delete" @click="confirmDelete"></q-btn>
+    <q-btn style="margin-bottom: 20px" v-if="!isDirty" round flat color="primary" icon="mdi-delete"
+           @click="confirmDelete"></q-btn>
+    <q-btn style="margin-bottom: 20px" v-else round flat color="primary" icon="mdi-content-save"
+           @click="saveStream" :disable="!saveActive"></q-btn>
   </div>
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useStreamStore} from "stores/StreamStore";
 import {useQuasar} from "quasar";
 
@@ -67,19 +74,42 @@ const endTimeRef = ref<string | undefined>();
 const colorRef = ref<string | undefined>();
 const nameRef = ref<string | undefined>();
 
+const startTimeError = ref<string | undefined>("");
+const endTimeError = ref<string | undefined>("");
+
+const isDirty = ref<boolean>(false);
+
 watch(startTimeRef, (value, oldValue, onCleanup) => {
+  if (oldValue !== undefined) {
+    isDirty.value = true
+  }
+  if (value > endTimeRef.value) {
+    endTimeError.value = `Start time cannot be after end time.`;
+  } else {
+    endTimeError.value = '';
+  }
   $streamStore.updateStream(uuidRef.value as string, 'startTime', value as string);
 })
 
 watch(endTimeRef, (value, oldValue, onCleanup) => {
+  if (oldValue !== undefined) {
+    isDirty.value = true
+  }
+  if (value < startTimeRef.value) {
+    endTimeError.value = `Start time cannot be after end time.`;
+  } else {
+    endTimeError.value = '';
+  }
   $streamStore.updateStream(uuidRef.value as string, 'endTime', value as string);
 })
 
 watch(colorRef, (value, oldValue, onCleanup) => {
+  if (oldValue !== undefined) isDirty.value = true;
   $streamStore.updateStream(uuidRef.value as string, 'color', value as string);
 })
 
 watch(nameRef, (value, oldValue, onCleanup) => {
+  if (oldValue !== undefined) isDirty.value = true;
   $streamStore.updateStream(uuidRef.value as string, 'name', value as string);
 })
 
@@ -91,6 +121,11 @@ onMounted(() => {
   nameRef.value = props.name;
 })
 
+const saveActive = computed(() => {
+  return !(startTimeError.value !== '' || endTimeError.value !== '');
+
+})
+
 const confirmDelete = () => {
   $q.dialog({
     title: 'Confirm deletion',
@@ -99,6 +134,11 @@ const confirmDelete = () => {
   }).onOk(() => {
     $streamStore.deleteStream(props.uuid as string)
   })
+}
+
+const saveStream = async () => {
+  await $streamStore.updateStreamOnServer(props.uuid as string);
+  isDirty.value = false;
 }
 </script>
 

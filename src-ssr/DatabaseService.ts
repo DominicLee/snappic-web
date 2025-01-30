@@ -56,10 +56,12 @@ export class SnappicDatabase {
   }
 
   async updateStream(stream: IRadioStream) {
-    const preppedQuery = this.unwrapConfig(stream);
-    const statement = `UPDATE Streams SET (${preppedQuery.columns}) WHERE uuid = ${stream.uuid})`;
-    const updateStream = this.db.prepare(statement).run(preppedQuery.values);
-    return updateStream.changes;
+    const statement = `UPDATE Streams SET color = ?, startTime = ?, endTime = ?, name = ? WHERE uuid = ?`;
+    try {
+      return this.db.prepare(statement).run(stream.color, stream.startTime, stream.endTime, stream.name, stream.uuid)
+    } catch (e: any) {
+      throw new Error(e.toString())
+    }
   }
 
   async deleteStreamByUuid(uuid: string) {
@@ -71,6 +73,7 @@ export class SnappicDatabase {
   private unwrapConfig(configObject: IRadioStream): Record<string, any> {
     const flat: Record<string, any> = {};
     for (const key in configObject) {
+      if (key === 'id') continue
       const value = configObject[key];
       if (typeof value === "object" && value !== null && !Array.isArray(value)) {
         for (const nestedKey in value) {
@@ -81,11 +84,16 @@ export class SnappicDatabase {
       }
     }
 
+    console.log(flat)
+
     const columns = Object.keys(flat).join(", ");
+    let updateColumns = Object.keys(flat).join(" = ?, ");
+    updateColumns += " = ?";
     const placeholders = Object.keys(flat).map(() => "?").join(", ");
     const values = Object.values(flat);
+    const updateValues = Object.values(flat).join(", ");
 
-    return {columns, placeholders, values};
+    return {columns, updateColumns, updateValues, placeholders, values};
   }
 
 }

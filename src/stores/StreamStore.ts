@@ -49,9 +49,14 @@ export const useStreamStore = defineStore('streamstore', {
       this.streams = fetchedStreams;
       return fetchedStreams;
     },
-    async updateStreamOnServer(stream: IRadioStream) {
+    async updateStreamOnServer(uuid: string) {
+      const foundStream: IRadioStream | undefined = this.streams.find((_stream: IRadioStream) => {
+        return _stream.uuid === uuid
+      })
+      console.log(foundStream);
+      if (!foundStream) return `Couldn't find stream with uuid ${uuid}`
       // Update in db
-      await updateStream(stream);
+      return await updateStream(foundStream);
     },
   },
 });

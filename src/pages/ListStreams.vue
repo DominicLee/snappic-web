@@ -33,6 +33,7 @@ const $q = useQuasar()
 const $streamStore = useStreamStore();
 
 const isEmptyState = computed(() => {
+  if (!$streamStore) return true;
   return $streamStore.getAllStreams.length === 0
 })
 

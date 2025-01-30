@@ -25,27 +25,43 @@ export const create = defineSsrCreate((/* { ... } */) => {
   const db = new SnappicDatabase('snappic.db');
 
   app.get(ENDPOINTS.FETCH_STREAMS, async (req, res) => {
-    db.getAllStreams().then((streams: IRadioStream) => {
-      res.status(200).json(streams)
-    })
+    try {
+      db.getAllStreams().then((streams: IRadioStream) => {
+        res.status(200).json(streams)
+      })
+    } catch (e: any) {
+      res.status(400)
+    }
   })
 
   app.post(ENDPOINTS.SAVE_STREAM, async (req, res) => {
-    const streamToSave = req.body as IRadioStream;
-    const saveIntoDatabaseAndReturnId: number = await db.insertStream(streamToSave)
-    res.status(201).json(saveIntoDatabaseAndReturnId);
+    try {
+      const streamToSave = req.body as IRadioStream;
+      const saveIntoDatabaseAndReturnId: number = await db.insertStream(streamToSave)
+      res.status(201).json(saveIntoDatabaseAndReturnId);
+    } catch (e: any) {
+      res.status(400)
+    }
   })
 
   app.post(ENDPOINTS.UPDATE_STREAM, async (req, res) => {
-    const streamToSave = req.body as IRadioStream;
-    const updateDatabase: string = await db.updateStream(streamToSave);
-    res.status(200).json(updateDatabase);
+    try {
+      const streamToSave = req.body as IRadioStream;
+      const updateDatabase: string = await db.updateStream(streamToSave);
+      res.status(200).json(updateDatabase);
+    } catch (e: any) {
+      res.status(400)
+    }
   })
 
   app.post(ENDPOINTS.DELETE_STREAM, async (req, res) => {
-    const streamUuidToDelete = req.body.uuid as string;
-    const deleteStream: string = await db.deleteStreamByUuid(streamUuidToDelete);
-    res.status(200).json(deleteStream);
+    try {
+      const streamUuidToDelete = req.body.uuid as string;
+      const deleteStream: string = await db.deleteStreamByUuid(streamUuidToDelete);
+      res.status(200).json(deleteStream);
+    } catch (e: any) {
+      res.status(400)
+    }
   })
 
   return app;

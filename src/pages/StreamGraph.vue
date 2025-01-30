@@ -58,15 +58,16 @@ const totalStreamTime = computed(() => {
 
 let allSessions: IRadioStream[] = [];
 
-onMounted(() => {
+onMounted(async () => {
+  if (process.env.CLIENT) {
+    await $streamStore.fetchStreamsFromServer();
+  }
   // Let's grab the sessions from the store
   allSessions = toRaw($streamStore.getAllStreams);
   // First let's sort the streams by starting time
   allSessions.sort((a: IRadioStream, b: IRadioStream) => {
     return timeStringToFloat(a.startTime) < timeStringToFloat(b.startTime) ? -1 : 1
   })
-
-  console.log(allSessions);
 
   // Set up a var to calculate overlap time
   let overlapTime: number = 0;
@@ -75,17 +76,25 @@ onMounted(() => {
   allSessions.forEach((_session, _index) => {
     if (_index === allSessions.length - 1) return
 
-    // Convert the string time to a float
+    let overlap: number = 0;
+
+    // Convert the string times to a float
     const endTimeFloat: number = timeStringToFloat(allSessions[_index].endTime);
     const nextStartTimeFloat: number = timeStringToFloat(allSessions[_index + 1].startTime);
+    const nextEndTimeFloat: number = timeStringToFloat(allSessions[_index + 1].endTime);
 
-    // If the next entry's start time overlaps the previous entry, count the overlap
     if (nextStartTimeFloat < endTimeFloat) {
-      // Calculate overlap time
-      const overlap: number = endTimeFloat - nextStartTimeFloat;
-      // Add the resulting overlap to the total overlap
-      overlapTime += overlap;
+      // If the next entry's start time overlaps the current entry, count the overlap
+      if (endTimeFloat > nextEndTimeFloat) {
+        // If the next entry's end time is before the current entry's end time, we can ignore it
+        return
+      } else {
+        // Calculate overlap time
+        overlap = endTimeFloat - nextStartTimeFloat;
+      }
     }
+    // Add the resulting overlap to the total overlap
+    overlapTime += overlap;
   })
 
   // Subtract the overlap time from the total time
