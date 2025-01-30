@@ -1,7 +1,7 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
-import { defineConfig } from '#q-app/wrappers';
+import {defineConfig} from '#q-app/wrappers';
 
 export default defineConfig((/* ctx */) => {
   return {
@@ -23,7 +23,7 @@ export default defineConfig((/* ctx */) => {
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
       // 'ionicons-v4',
-      // 'mdi-v7',
+      'mdi-v7',
       // 'fontawesome-v6',
       // 'eva-icons',
       // 'themify',
@@ -37,7 +37,7 @@ export default defineConfig((/* ctx */) => {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {
       target: {
-        browser: [ 'es2022', 'firefox115', 'chrome115', 'safari14' ],
+        browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
         node: 'node20'
       },
 
@@ -47,7 +47,7 @@ export default defineConfig((/* ctx */) => {
         // extendTsConfig (tsConfig) {}
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -65,7 +65,7 @@ export default defineConfig((/* ctx */) => {
 
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
-      
+
       // vitePlugins: [
       //   [ 'package-name', { ..pluginOptions.. }, { server: true, client: true } ]
       // ]
@@ -92,12 +92,12 @@ export default defineConfig((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: ['Notify', 'Dialog']
     },
 
     // animations: 'all', // --- includes all animations
     // https://v2.quasar.dev/options/animations
-    animations: [],
+    animations: 'all',
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#sourcefiles
     // sourceFiles: {
@@ -167,7 +167,7 @@ export default defineConfig((/* ctx */) => {
       // extendPackageJson (json) {},
 
       // Electron preload scripts (if any) from /src-electron, WITHOUT file extension
-      preloadScripts: [ 'electron-preload' ],
+      preloadScripts: ['electron-preload'],
 
       // specify the debugging port to use for the Electron app when running in development mode
       inspectPort: 5858,
