@@ -60,10 +60,13 @@ let allSessions: IRadioStream[] = [];
 
 onMounted(async () => {
   if (process.env.CLIENT) {
+    // Fetch streams and place them in the store
     await $streamStore.fetchStreamsFromServer();
   }
+
   // Let's grab the sessions from the store
   allSessions = toRaw($streamStore.getAllStreams);
+
   // First let's sort the streams by starting time
   allSessions.sort((a: IRadioStream, b: IRadioStream) => {
     return timeStringToFloat(a.startTime) < timeStringToFloat(b.startTime) ? -1 : 1
@@ -72,31 +75,44 @@ onMounted(async () => {
   // Set up a var to calculate overlap time
   let overlapTime: number = 0;
 
+  // Start the stream index at 0
+  let streamIndex: number = 0;
+
   // Now let's loop through the sorted list
-  allSessions.forEach((_session, _index) => {
-    if (_index === allSessions.length - 1) return
-
+  do {
     let overlap: number = 0;
+    // If there's a next entry in the list
+    if (allSessions[streamIndex + 1]) {
+      // Convert the string times to a float
+      const endTimeFloat: number = timeStringToFloat(allSessions[streamIndex].endTime);
+      // What time does the next stream start?
+      const nextStartTimeFloat: number = timeStringToFloat(allSessions[streamIndex + 1].startTime);
+      // What time does the next stream end?
+      const nextEndTimeFloat: number = timeStringToFloat(allSessions[streamIndex + 1].endTime);
 
-    // Convert the string times to a float
-    const endTimeFloat: number = timeStringToFloat(allSessions[_index].endTime);
-    const nextStartTimeFloat: number = timeStringToFloat(allSessions[_index + 1].startTime);
-    const nextEndTimeFloat: number = timeStringToFloat(allSessions[_index + 1].endTime);
-
-    if (nextStartTimeFloat < endTimeFloat) {
-      // If the next entry's start time overlaps the current entry, count the overlap
       if (endTimeFloat > nextEndTimeFloat) {
-        // If the next entry's end time is before the current entry's end time, we can ignore it
-        return
+        // If the next entry's end time is before the current entry's end time, we can just add it to overlap
+        overlap = nextEndTimeFloat - nextStartTimeFloat;
+        overlapTime += overlap;
+        // We can remove it from the array to process the next one - this is why we have a do/while rather than for/of
+        allSessions.splice(streamIndex + 1, 1);
       } else {
-        // Calculate overlap time
-        overlap = endTimeFloat - nextStartTimeFloat;
+        // If the next entry's start time overlaps the current entry, prep for overlap check
+        if (nextStartTimeFloat < endTimeFloat) {
+          // Calculate overlap time
+          overlap = endTimeFloat - nextStartTimeFloat;
+          // Add overlap time to total overlap
+          overlapTime += overlap;
+        }
+        // Move to next stream
+        streamIndex++;
       }
+    } else {
+      // It's the last entry, we don't have to calculate the next overlap
+      streamIndex++;
     }
-    // Add the resulting overlap to the total overlap
-    overlapTime += overlap;
-  })
-
+    // Do until the streams are exhausted
+  } while (streamIndex <= allSessions.length)
   // Subtract the overlap time from the total time
   rationalisedStreamTime.value = totalStreamTime.value - overlapTime
 })

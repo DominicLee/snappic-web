@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import {v4} from 'uuid'
-import {computed} from "vue";
+import {computed, onMounted} from "vue";
 import {useStreamStore} from "stores/StreamStore";
 import EmptyState from "components/EmptyState.vue";
 import StreamEditor from "components/StreamEditor.vue";
@@ -35,6 +35,12 @@ const $streamStore = useStreamStore();
 const isEmptyState = computed(() => {
   if (!$streamStore) return true;
   return $streamStore.getAllStreams.length === 0
+})
+
+onMounted(async () => {
+  if (process.env.CLIENT) {
+    await $streamStore.fetchStreamsFromServer();
+  }
 })
 
 const addStream = () => {

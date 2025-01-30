@@ -132,12 +132,26 @@ const confirmDelete = () => {
     message: `Are you sure you want to delete stream ${nameRef.value}?`,
     cancel: 'Cancel'
   }).onOk(() => {
-    $streamStore.deleteStream(props.uuid as string)
+    $streamStore.deleteStream(props.uuid as string);
+    $q.notify({
+      icon: 'mdi-check-bold',
+      position: "bottom-right",
+      caption: `Stream ${nameRef.value} deleted successfully.`,
+      color: 'positive',
+      timeout: 2000
+    })
   })
 }
 
 const saveStream = async () => {
   await $streamStore.updateStreamOnServer(props.uuid as string);
+  $q.notify({
+    icon: 'mdi-check-bold',
+    position: "bottom-right",
+    caption: `Stream ${nameRef.value}saved successfully.`,
+    color: 'positive',
+    timeout: 2000
+  })
   isDirty.value = false;
 }
 </script>
