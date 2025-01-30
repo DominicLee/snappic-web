@@ -2,6 +2,14 @@
 
 Thank you for the opportunity to present my full-stack assessment - Dom
 
+## Demo website:
+
+A working version of the web app is available at
+
+```aiignore
+https://qfq3cdusux0qryz713290.cleavr.one/
+```
+
 ## Technologies used
 
 ### VueJS
@@ -26,6 +34,10 @@ The Express server code can be found in ``/src-ssr/server.ts``
 ### SQLite
 
 I chose SQLite as it is flexible and fast, and can easily be accessed using the ``better-sqlite3`` npm package.
+
+### Animations
+
+Animations are handled by both the Greensock Animation Platform as well as animate.css, depending on use case.
 
 ## Database
 
@@ -73,6 +85,10 @@ Currently the API is accessed without a token. For production I would add JWT fu
 ### Improved error handling
 
 While every effort has been made to handle errors, additional checks and balances could be implemented.
+
+### Better responsivity
+
+A mobile screen version of the web app is available but could do with some improvements.
 
 ### Database
 
